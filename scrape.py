@@ -13,7 +13,7 @@ def get_soup(url,header):
 
 query = raw_input("query image\n")# you can change the query for the image  here
 now = datetime.datetime.now()
-image_type="ActiOn" + now.strftime("%Y-%m-%d %H:%M")
+image_type="ActiOn" + now.strftime("%Y-%m-%d%H:%M")
 query= query.split()
 query='+'.join(query)
 url="https://www.google.co.in/search?q="+query+"&source=lnms&tbm=isch"
