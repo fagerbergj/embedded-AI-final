@@ -9,17 +9,22 @@ import argparse
 import imutils
 import time
 import cv2
+import pickle
+
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
+# TODO replace prototxt with something? its args for the model it looks like
 ap.add_argument("-p", "--prototxt", required=True,
 	help="path to Caffe 'deploy' prototxt file")
+# TODO replace caffe model with trained model Robots1.txt
 ap.add_argument("-m", "--model", required=True,
 	help="path to Caffe pre-trained model")
 ap.add_argument("-c", "--confidence", type=float, default=0.2,
 	help="minimum probability to filter weak detections")
 args = vars(ap.parse_args())
 
+# TODO replace with the 2 classes we have
 # initialize the list of class labels MobileNet SSD was trained to
 # detect, then generate a set of bounding box colors for each class
 CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
@@ -30,6 +35,7 @@ COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
 
 # load our serialized model from disk
 print("[INFO] loading model...")
+# TODO load Robots1.model
 net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
 
 # initialize the video stream, allow the cammera sensor to warmup,
