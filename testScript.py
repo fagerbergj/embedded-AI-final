@@ -1,63 +1,70 @@
-# import necessary packages 
+# import the necessary packages
 from keras.preprocessing.image import img_to_array
 from keras.models import load_model
+from imutils.video import VideoStream
+from threading import Thread
 import numpy as np
-import argparse
-import pickle
+import imutils
+import time
 import cv2
 import os
-import imutils
 
-# construct the argument parse and parse the arguments
-ap = argparse.ArgumentParser()
-ap.add_argument("-m", "--model", required=True, help="path to trained model")
-ap.add_argument("-l", "--labelbin", required = True, help="path to label binarizer")
-ap.add_argument("-i", "--image", required=True, help = "path to input image")
-args = vars(ap.parse_args())
+MODEL_PATH = "Robots1.model"
 
-#load image
-image = cv2.imread(args["image"])
-output = image.copy()
+# load the model
+print("[INFO] loading model...")
+model = load_model(MODEL_PATH)
 
-#preprocess the image
-image = cv2.resize(image, (96, 96))
-image = image.astype("float")/255.0
-image = img_to_array(image)
-image = np.expand_dims(image, axis=0)
-
-#load the trained model
-print("[INFO] loading network...")
-model = load_model(args["model"])
-lb = pickle.loads(open(args["labelbin"], "rb").read())
-
+# initialize the video stream and allow the camera sensor to warm up
 print("[INFO] starting video stream...")
 vs = VideoStream(src=0).start()
 # vs = VideoStream(usePiCamera=True).start()
 time.sleep(2.0)
 
-# start the FPS counter
-fps = FPS().start()
-
+# loop over the frames from the video stream
 while True:
-    #classify the input image
-    print("[INFO] classifying image...")
-    proba = model.predict(image)[0]
-    idx = np.argmax(proba)
-    label = lb.classes_[idx]
-
-    # mark prediction as correct if the input filename contains the predicted label text 
-    #filename = args["image"][args["image"].rfind(os.path.sep)+1:]
-    #correct = "correct" if filename.rfind(label) != -1 else "incorrect"
-
-    frame = vs.read()
-    # fuck his imutils shit
+	# grab the frame from the threaded video stream and resize it
+	# to have a maximum width of 400 pixels
+	frame = vs.read()
     frame = imutils.resize(frame, width=400)
 
-    #build the label and draw the label on the image
-    label = "{}: {:.2f}% ({})".format(label, proba[idx] * 100, correct)
-    output = imutils.resize(output, width=400)
-    cv2.putText(output, label, (10,25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,0),2)
+    # prepare the image to be classified by our deep learning network
+	image = cv2.resize(frame, (28, 28))
+	image = image.astype("float") / 255.0
+	image = img_to_array(image)
+	image = np.expand_dims(image, axis=0)
 
-    #print("[INFO] {}".format(label))
-    cv2.imshow("Output", output)
-    #cv2.waitKey(0)
+    # classify the input image and initialize the label and
+	# probability of the prediction
+	(robot, human) = model.predict(image)[0]
+	label = "Robot"
+	proba = robot
+
+    # check to see if santa was detected using our convolutional
+	# neural network
+	if human > robot:
+		# update the label and prediction probability
+		label = "Human"
+		proba = human
+
+    if human < 50 and robot < 50:
+        label = "Unable to determine"
+        proba = 0
+
+    # build the label and draw it on the frame
+	label = "{}: {:.2f}%".format(label, proba * 100)
+	frame = cv2.putText(frame, label, (10, 25),
+		cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+ 
+	# show the output frame
+	cv2.imshow("Frame", frame)
+	key = cv2.waitKey(1) & 0xFF
+ 
+	# if the `q` key was pressed, break from the loop
+	if key == ord("q"):
+		break
+ 
+# do a bit of cleanup
+print("[INFO] cleaning up...")
+cv2.destroyAllWindows()
+vs.stop()
