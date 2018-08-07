@@ -23,7 +23,7 @@ time.sleep(2.0)
 
 # loop over the frames from the video stream
 while True:
-	# grab the frame from the threaded video stream and resize it
+    # grab the frame from the threaded video stream and resize it
 	# to have a maximum width of 400 pixels
 	frame = vs.read()
     frame = imutils.resize(frame, width=400)
@@ -55,15 +55,15 @@ while True:
 	label = "{}: {:.2f}%".format(label, proba * 100)
 	frame = cv2.putText(frame, label, (10, 25),
 		cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
- 
+
 	# show the output frame
 	cv2.imshow("Frame", frame)
 	key = cv2.waitKey(1) & 0xFF
- 
+
 	# if the `q` key was pressed, break from the loop
 	if key == ord("q"):
 		break
- 
+        
 # do a bit of cleanup
 print("[INFO] cleaning up...")
 cv2.destroyAllWindows()
