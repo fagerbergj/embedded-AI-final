@@ -30,21 +30,34 @@ print("[INFO] loading network...")
 model = load_model(args["model"])
 lb = pickle.loads(open(args["labelbin"], "rb").read())
 
-#classify the input image
-print("[INFO] classifying image...")
-proba = model.predict(image)[0]
-idx = np.argmax(proba)
-label = lb.classes_[idx]
+print("[INFO] starting video stream...")
+vs = VideoStream(src=0).start()
+# vs = VideoStream(usePiCamera=True).start()
+time.sleep(2.0)
 
-#mark prediction as correct if the input filename contains the predicted label text 
-filename = args["image"][args["image"].rfind(os.path.sep)+1:]
-correct = "correct" if filename.rfind(label) != -1 else "incorrect"
+# start the FPS counter
+fps = FPS().start()
 
-#build the label and draw the label on the image
-label = "{}: {:.2f}% ({})".format(label, proba[idx] * 100, correct)
-output = imutils.resize(output, width=400)
-cv2.putText(output, label, (10,25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,0),2)
+while True:
+    #classify the input image
+    print("[INFO] classifying image...")
+    proba = model.predict(image)[0]
+    idx = np.argmax(proba)
+    label = lb.classes_[idx]
 
-print("[INFO] {}".format(label))
-cv2.imshow("Output", output)
-cv2.waitKey(0)
+    # mark prediction as correct if the input filename contains the predicted label text 
+    #filename = args["image"][args["image"].rfind(os.path.sep)+1:]
+    #correct = "correct" if filename.rfind(label) != -1 else "incorrect"
+
+    frame = vs.read()
+    # fuck his imutils shit
+    frame = imutils.resize(frame, width=400)
+
+    #build the label and draw the label on the image
+    label = "{}: {:.2f}% ({})".format(label, proba[idx] * 100, correct)
+    output = imutils.resize(output, width=400)
+    cv2.putText(output, label, (10,25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,0),2)
+
+    #print("[INFO] {}".format(label))
+    cv2.imshow("Output", output)
+    #cv2.waitKey(0)
