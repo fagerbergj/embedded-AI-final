@@ -34,9 +34,9 @@ ap.add_argument("-p", "--plot", type=str, default="plot.png", help="path to outp
 args = vars(ap.parse_args())
 
 #initialize the number of epochs to train for, initial learning rate, batch size, and image dimensions
-EPOCHS = 10
+EPOCHS = 40
 INIT_LR = 1e-3
-BS = 10
+BS = 12
 IMAGE_DIMS = (96,96,3)
 
 #initialize the data and labels
@@ -51,6 +51,7 @@ random.shuffle(imagePaths)
 
 #loop over input images
 for imagePath in imagePaths:
+    #print(imagePath)
     #load image, preprocess it, and store it in the data list
     image = cv2.imread(imagePath)
     image = cv2.resize(image, (IMAGE_DIMS[1], IMAGE_DIMS[0]))   
