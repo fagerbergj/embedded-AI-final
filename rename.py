@@ -1,8 +1,8 @@
 import os
-path = '/Users/jasonmac/workspace/python/final/dataset/robot'
+path = '/Users/jasonmac/workspace/python/final/dataset/human'
 files = os.listdir(path)
 i = 1
 
 for file in files:
-    os.rename(os.path.join(path, file), os.path.join(path, str(i)+'.jpg'))
+    os.rename(os.path.join(path, file), os.path.join(path,"pic"+ str(i)+'.jpg'))
     i = i+1
