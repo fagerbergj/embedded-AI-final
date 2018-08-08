@@ -6,12 +6,15 @@ import numpy as np
 import time
 import cv2
 import os
+import pickle
 
 MODEL_PATH = "Robots1.model"
+LABEL_PATH = "lb.pickle"
 
 # load the model
 print("[INFO] loading model...")
 model = load_model(MODEL_PATH)
+lb = pickle.loads(open(LABEL_PATH).read())
 
 # initialize the video stream and allow the camera sensor to warm up
 print("[INFO] starting video stream...")
@@ -34,27 +37,15 @@ while True:
     b = 0
     # classify the input image and initialize the label and
     # probability of the prediction
-    (robot, human) = model.predict(image)[0]
-    label = ""
-    proba = 0
-
-    if human < .8 and robot < .8:
-        label = "UNIDENTIFIED OBJECT"
+    proba = model.predict(image)
+    idx = np.argmax(proba)
+    label = lb.classes_[idx]
+    if idx < 80:
+        label = "Unidentified Object"
         b = 255
-        if robot > human:
-            proba = robot
-        else:
-            proba = human
-    elif robot > human:
+    elif label == "robot":
         r = 255
-        label = "Robot"
-        proba = robot
-        # check to see if santa was detected using our convolutional
-        # neural network
-    elif human > robot:
-        # update the label and prediction probability
-        label = "Human"
-        proba = human
+    else:
         g = 255
 
     # build the label and draw it on the frame
