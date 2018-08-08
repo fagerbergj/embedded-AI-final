@@ -4,7 +4,6 @@ from keras.models import load_model
 from imutils.video import VideoStream
 from threading import Thread
 import numpy as np
-import imutils
 import time
 import cv2
 import os
@@ -26,7 +25,6 @@ while True:
     # grab the frame from the threaded video stream and resize it
     # to have a maximum width of 400 pixels
     frame = vs.read()
-    #frame = imutils.resize(frame, width=400)
     # prepare the image to be classified by our deep learning network
     image = cv2.resize(frame, (96, 96))
     image = image.astype("float") / 255.0
@@ -57,6 +55,8 @@ while True:
     # build the label and draw it on the frame
     label = "{}: {:.2f}%".format(label, proba * 100)
     frame = cv2.putText(frame, label, (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (b, g, r), 2)
+    
+    frame = cv2.copyMakeBorder(frame, 10, 10, 10, 10, cv2.BORDER_CONSTANT, (b, g, r))
     # show the output frame
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
