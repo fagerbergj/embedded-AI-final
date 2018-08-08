@@ -35,11 +35,20 @@ while True:
     # classify the input image and initialize the label and
     # probability of the prediction
     (robot, human) = model.predict(image)[0]
-    label = "Robot"
-    proba = robot
+    label = ""
+    proba = 0
 
-    if robot > human:
+    if human < .8 and robot < .8:
+        label = "UNIDENTIFIED OBJECT"
+        b = 255
+        if robot > human:
+            proba = robot
+        else:
+            proba = human
+    elif robot > human:
         r = 255
+        label = "Robot"
+        proba = robot
         # check to see if santa was detected using our convolutional
         # neural network
     elif human > robot:
@@ -47,9 +56,6 @@ while True:
         label = "Human"
         proba = human
         g = 255
-    elif human < .7 and robot < .7:
-        label = "WHAT ARE YOU?!?!?!?"
-        b = 255
 
     # build the label and draw it on the frame
     label = "{}: {:.2f}%".format(label, proba * 100)
