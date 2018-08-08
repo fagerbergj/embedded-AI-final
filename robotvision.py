@@ -26,7 +26,7 @@ while True:
     # grab the frame from the threaded video stream and resize it
     # to have a maximum width of 400 pixels
     frame = vs.read()
-    frame = imutils.resize(frame, width=400)
+    #frame = imutils.resize(frame, width=400)
     # prepare the image to be classified by our deep learning network
     image = cv2.resize(frame, (96, 96))
     image = image.astype("float") / 255.0
