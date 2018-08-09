@@ -46,7 +46,8 @@ widthSlice = int(width/widthMul)
 heightSlice = int(height/heightMul)
 
 # Define the codec and create VideoWriter object
-out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (width,height))
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+out = cv2.VideoWriter('output.avi', fourcc, 5.0, (width, height))
 
 # loop over the frames from the video stream
 while True:
@@ -56,7 +57,6 @@ while True:
     frame = f[1]
     # prepare the image to be classified by our deep learning network
     image = frame[heightSlice:(heightMul-1) * heightSlice, widthSlice : (widthMul-1) * widthSlice , :]
-    #print(image.shape)
     image = cv2.resize(image, (96, 96))
     image = image.astype("float") / 255.0
     image = img_to_array(image)
