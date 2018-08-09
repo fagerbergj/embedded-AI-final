@@ -11,18 +11,12 @@ import argparse
 
 # args
 ap = argparse.ArgumentParser()
-ap.add_argument("-m", "--model", required=True,
-    help="path to input model")
-ap.add_argument("-l", "--label", required=True,
-    help="path to input label binarizer")
-ap.add_argument("-c", "--confidence", type=float, default=.7,
-    help="threashold for confidence in labeling")
-ap.add_argument("-t", "--crosshair_thickness", required=False, type=int, default=4,
-    help="thickness of crosshair")
-ap.add_argument("-wc", "--crosshair_width_frac", required=False, type=int, default=3,
-    help="fraction not covered on left/right of crosshair")
-ap.add_argument("-hc", "--crosshair_height_frac", required=False, type=int, default=4,
-    help="fraction not covered on top/bottom of crosshair")
+ap.add_argument("-m", "--model", required=True, help="path to input model")
+ap.add_argument("-l", "--label", required=True, help="path to input label binarizer")
+ap.add_argument("-c", "--confidence", type=float, default=.7,help="threashold for confidence in labeling")
+ap.add_argument("-t", "--crosshair_thickness", required=False, type=int, default=4,help="thickness of crosshair")
+ap.add_argument("-wc", "--crosshair_width_frac", required=False, type=int, default=3,help="fraction not covered on left/right of crosshair")
+ap.add_argument("-hc", "--crosshair_height_frac", required=False, type=int, default=4,help="fraction not covered on top/bottom of crosshair")
 args = vars(ap.parse_args())
 
 # path to needed files
