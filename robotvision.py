@@ -17,11 +17,13 @@ ap.add_argument("-c", "--confidence", type=float, default=.7,help="threashold fo
 ap.add_argument("-t", "--crosshair_thickness", required=False, type=int, default=4,help="thickness of crosshair")
 ap.add_argument("-wc", "--crosshair_width_frac", required=False, type=int, default=3,help="fraction not covered on left/right of crosshair")
 ap.add_argument("-hc", "--crosshair_height_frac", required=False, type=int, default=4,help="fraction not covered on top/bottom of crosshair")
+ap.add_argument("-o", "--video_output", required=False, type=str, default="result.avi",help="path for output video")
 args = vars(ap.parse_args())
 
 # path to needed files
 MODEL_PATH = args["model"]
 LABEL_PATH = args["label"]
+OUTPUT = args["video_output"]
 
 # load the model
 print("[INFO] loading model...")
@@ -42,6 +44,9 @@ widthMul = args["crosshair_width_frac"]
 heightMul = args["crosshair_height_frac"]
 widthSlice = int(width/widthMul)
 heightSlice = int(height/heightMul)
+
+# Define the codec and create VideoWriter object
+out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (width,height))
 
 # loop over the frames from the video stream
 while True:
@@ -84,6 +89,8 @@ while True:
     cv2.line(frame, (int(width/2), heightSlice), (int(width/2), (heightMul - 1) * heightSlice), (b,g,r), lineThickness)
 
     # show the output frame
+    # write output frame
+    out.write(frame)
     #cv2.imshow("Frame", frame)
     cv2.imshow("frame", frame)
     key = cv2.waitKey(1) & 0xFF
@@ -94,5 +101,6 @@ while True:
 # do a bit of cleanup
 print("[INFO] cleaning up...")
 vs.release()
+out.release()
 cv2.destroyAllWindows()
 
