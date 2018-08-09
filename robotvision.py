@@ -45,9 +45,10 @@ heightMul = args["crosshair_height_frac"]
 widthSlice = int(width/widthMul)
 heightSlice = int(height/heightMul)
 
-# Define the codec and create VideoWriter object
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter('output.avi', fourcc, 5.0, (width, height))
+codec = cv2.VideoWriter_fourcc('X', 'V', 'I', 'D')
+framerate = 5
+resolution = (20+width,20+height)
+VideoFileOutput = cv2.VideoWriter(OUTPUT, codec, framerate, resolution)
 
 # loop over the frames from the video stream
 while True:
@@ -57,6 +58,7 @@ while True:
     frame = f[1]
     # prepare the image to be classified by our deep learning network
     image = frame[heightSlice:(heightMul-1) * heightSlice, widthSlice : (widthMul-1) * widthSlice , :]
+    #print(image.shape)
     image = cv2.resize(image, (96, 96))
     image = image.astype("float") / 255.0
     image = img_to_array(image)
@@ -89,9 +91,7 @@ while True:
     cv2.line(frame, (int(width/2), heightSlice), (int(width/2), (heightMul - 1) * heightSlice), (b,g,r), lineThickness)
 
     # show the output frame
-    # write output frame
-    out.write(frame)
-    #cv2.imshow("Frame", frame)
+    VideoFileOutput.write(frame)
     cv2.imshow("frame", frame)
     key = cv2.waitKey(1) & 0xFF
     # if the `q` key was pressed, break from the loop
@@ -101,6 +101,6 @@ while True:
 # do a bit of cleanup
 print("[INFO] cleaning up...")
 vs.release()
-out.release()
+VideoFileOutput.release()
 cv2.destroyAllWindows()
 
