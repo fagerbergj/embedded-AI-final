@@ -60,7 +60,7 @@ while True:
     # probability of the prediction
     proba = model.predict(image)[0]
     idx = np.argmax(proba)
-    label = lb.classes_[idx]
+    label = lb.classes_[idx].decode("utf-8")
     
     if proba[idx] < .7:
         label = "Unidentified Object"
