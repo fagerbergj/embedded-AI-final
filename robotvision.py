@@ -7,9 +7,27 @@ import time
 import cv2
 import os
 import pickle
+import argparse
 
-MODEL_PATH = "Robots1.model"
-LABEL_PATH = "lb.pickle"
+# args
+ap = argparse.ArgumentParser()
+ap.add_argument("-m", "--model", required=True,
+    help="path to input model")
+ap.add_argument("-l", "--label", required=True,
+    help="path to input label binarizer")
+ap.add_argument("-c", "--confidence", type=float, default=.7,
+    help="threashold for confidence in labeling")
+ap.add_argument("-t", "--crosshair_thickness", required=False, type=int, default=4,
+    help="thickness of crosshair")
+ap.add_argument("-wc", "--crosshair_width_frac", required=False, type=int, default=3,
+    help="fraction not covered on left/right of crosshair")
+ap.add_argument("-hc", "--crosshair_height_frac", required=False, type=int, default=4,
+    help="fraction not covered on top/bottom of crosshair")
+args = vars(ap.parse_args())
+
+# path to needed files
+MODEL_PATH = args["model"]
+LABEL_PATH = args["label"]
 
 # load the model
 print("[INFO] loading model...")
@@ -21,11 +39,13 @@ print("[INFO] starting video stream...")
 vs = cv2.VideoCapture(0)
 time.sleep(2.0)
 
+#width of screen
 width = int(vs.get(3))  # float
 height = int(vs.get(4)) # float
 
-widthMul = 3
-heightMul = 7
+#section off screen to only get crosshair
+widthMul = args["crosshair_width_frac"]
+heightMul = args["crosshair_height_frac"]
 widthSlice = int(width/widthMul)
 heightSlice = int(height/heightMul)
 
@@ -49,9 +69,10 @@ while True:
     # probability of the prediction
     proba = model.predict(image)[0]
     idx = np.argmax(proba)
-    label = lb.classes_[idx]
-    
-    if proba[idx] < .7:
+    label = lb.classes_[idx].decode("utf-8")
+    conf = args["confidence"]
+
+    if proba[idx] < conf:
         label = "Unidentified Object"
         b = 255
     elif label == "robot":
@@ -62,15 +83,15 @@ while True:
     # build the label and draw it on the frame
     label = "{}: {:.2f}%".format(label, proba[idx] * 100)
     frame = cv2.putText(frame, label, (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (b, g, r), 2)
-    border = cv2.copyMakeBorder(frame, 10, 10, 10, 10, cv2.BORDER_CONSTANT, value=[b, g, r])
+    frame = cv2.copyMakeBorder(frame, 10, 10, 10, 10, cv2.BORDER_CONSTANT, value=[b, g, r])
 
-    lineThickness = 12
-    cv2.line(border, (widthSlice, int(height/2)), ((widthMul - 1)* widthSlice, int(height/2)), (b,g,r), lineThickness)
-    cv2.line(border, (int(width/2), heightSlice), (int(width/2), (heightMul - 1) * heightSlice), (b,g,r), lineThickness)
+    lineThickness = args["crosshair_thickness"]
+    cv2.line(frame, (widthSlice, int(height/2)), ((widthMul - 1)* widthSlice, int(height/2)), (b,g,r), lineThickness)
+    cv2.line(frame, (int(width/2), heightSlice), (int(width/2), (heightMul - 1) * heightSlice), (b,g,r), lineThickness)
 
     # show the output frame
     #cv2.imshow("Frame", frame)
-    cv2.imshow("border", border)
+    cv2.imshow("frame", frame)
     key = cv2.waitKey(1) & 0xFF
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
@@ -80,3 +101,4 @@ while True:
 print("[INFO] cleaning up...")
 vs.release()
 cv2.destroyAllWindows()
+
