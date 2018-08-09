@@ -24,6 +24,11 @@ time.sleep(2.0)
 width = int(vs.get(3))  # float
 height = int(vs.get(4)) # float
 
+widthMul = 3
+heightMul = 7
+widthSlice = int(width/widthMul)
+heightSlice = int(height/heightMul)
+
 # loop over the frames from the video stream
 while True:
     # grab the frame from the threaded video stream and resize it
@@ -31,7 +36,7 @@ while True:
     f = vs.read()
     frame = f[1]
     # prepare the image to be classified by our deep learning network
-    image = frame[height/5:4*height/5, width/3:2*width/3, :]
+    image = frame[heightSlice:(heightMul-1) * heightSlice, widthSlice : (widthMul-1) * widthSlice , :]
     #print(image.shape)
     image = cv2.resize(image, (96, 96))
     image = image.astype("float") / 255.0
@@ -60,8 +65,8 @@ while True:
     border = cv2.copyMakeBorder(frame, 10, 10, 10, 10, cv2.BORDER_CONSTANT, value=[b, g, r])
 
     lineThickness = 12
-    cv2.line(border, (width/3, height/2), (2* width/3, height/2), (b,g,r), lineThickness)
-    cv2.line(border, (width/2, height/7), (width/2, 6* height/7), (b,g,r), lineThickness)
+    cv2.line(border, (widthSlice, int(height/2)), ((widthMul - 1)* widthSlice, int(height/2)), (b,g,r), lineThickness)
+    cv2.line(border, (int(width/2), heightSlice), (int(width/2), (heightMul - 1) * heightSlice), (b,g,r), lineThickness)
 
     # show the output frame
     #cv2.imshow("Frame", frame)
