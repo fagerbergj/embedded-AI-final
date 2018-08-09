@@ -1,5 +1,5 @@
 import os
-path = '/Users/jasonmac/workspace/python/final/dataset/human'
+path = '/Users/jasonmac/workspace/python/final/dataset/robot'
 files = os.listdir(path)
 i = 1
 
